@@ -1,5 +1,4 @@
-const urlShortener = require('../urlShortener').default;
-const { isUrlValid, generateUrlCode } = require('../urlShortener');
+const { urlShortener, urlGetter,isUrlValid, generateUrlCode } = require('../urlShortener');
 const assert = require('chai').assert;
 
 
@@ -18,6 +17,19 @@ describe('isUrlValid() testing',function () {
         })
     });
 
+
+    it('should return valid response (not error) on valid url', function() {
+        this.timeout(5000);
+        const validUrl = "http://www.google.com";
+        return isUrlValid(validUrl)
+        .then( (ret) => {
+            assert.ok(ret, "Valid response or at least didnt throw err");
+            return;
+        })
+        .catch( (err) => {
+            assert.fail(err, null, "Promise rejected.")
+        })
+    })
 
     it('should return valid response (not error) on valid url', function() {
         this.timeout(5000);
@@ -58,13 +70,11 @@ describe('urlShortener tests', function() {
 
 
 
-
-
 describe('generateUrlCode tests', function() {
     this.timeout(5000);
     it('should return a Number code', function() {
-        const validUrl = "www.google.com.ar";
-        return generateUrlCode(validUrl)
+        const url = "www.google.com.ar";
+        return generateUrlCode(url)
         .then( (ret) => {
             assert.equal( typeof(ret), "number", 'returned type is not a Number');
         } )
@@ -73,3 +83,22 @@ describe('generateUrlCode tests', function() {
         } );
     })
 });
+
+
+describe('urlGetter tests', function() {
+    this.timeout(5000);
+    it('should return a valid url after generating a short_url', function() {
+        const validUrl = "www.google.com";
+        return urlShortener(validUrl)
+        .then( (ret) => urlGetter(ret.short_url))
+        .then( (validUrl) => isUrlValid(validUrl))
+        .then( (ret) => {
+            assert.ok(ret, "Valid response or at least didnt throw err");
+            return;
+        })
+        .catch( (err) => {
+            assert.fail(err, null, "Promise rejected.")
+        })
+
+    })
+})

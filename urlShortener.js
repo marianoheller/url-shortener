@@ -1,8 +1,7 @@
 const dns = require('dns');
-const mongodb = require('mongodb');
 const mongoose = require('mongoose');
 const autoIncrement = require('mongoose-auto-increment');
-
+const urlRecordModel = require('./urlModel');
 
 /**
  * //Shorten url
@@ -12,10 +11,13 @@ function urlShortener (url) {
     return isUrlValid(url)
     .then( () => {
         //Valid URL
-        return {
-            original_url: url,
-            short_url: 1,
-        }
+        return generateUrlCode(url)
+        .then( (code) => {
+            return {
+                original_url: url,
+                short_url: code,
+            }
+        });
     }, (ret) => ret);
 }
 
@@ -43,28 +45,6 @@ function isUrlValid(url) {
  * @param {string} url 
  */
 function generateUrlCode(url) {
-    const dbUrl = 'mongodb://localhost/url_records';
-    mongoose.Promise = global.Promise;
-    const connection = mongoose.connect(dbUrl, {
-        keepAlive: true,
-        reconnectTries: Number.MAX_VALUE,
-        useMongoClient: true
-    });
-    autoIncrement.initialize(connection);
-
-
-    const Schema = mongoose.Schema;
-    const ObjectId = Schema.ObjectId;
-
-    const urlRecordSchema = new Schema({
-        original_url: String,
-        short_url: ObjectId,
-    });
-    urlRecordSchema.plugin(autoIncrement.plugin, 'urlRecord');
-
-    
-    const urlRecordModel = connection.model('urlRecord', urlRecordSchema);
-
 
     const urlRecord = new urlRecordModel( { original_url: url } );
     return new Promise( (resolve, reject) => {
@@ -79,10 +59,24 @@ function generateUrlCode(url) {
     
 }
 
+/**
+ * Gets url from database given short_url
+ * @param {string} code Short url
+ */
+function urlGetter (code) {
+    return new Promise( (resolve, reject) => {
+        urlRecordModel.findOne({ _id: code}, (err, res) => {
+            if( err ) reject(err);
+            resolve(res.original_url);
+        })
+    })
+}
+
 
 
 module.exports = {
-    default: urlShortener,
+    urlShortener: urlShortener,
+    urlGetter: urlGetter,
     isUrlValid: isUrlValid,
     generateUrlCode: generateUrlCode,
 }

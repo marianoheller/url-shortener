@@ -5,16 +5,25 @@ var mongo = require('mongodb');
 var mongoose = require('mongoose');
 
 var cors = require('cors');
+var bodyParser = require('body-parser')
+
+const { urlShortener, urlGetter } = require('./urlShortener');
 
 var app = express();
 
+
 // Basic Configuration 
-var port = process.env.PORT || 3000;
+//var port = process.env.PORT || 3000;
+var port = 3000;
 
 /** this project needs a db !! **/ 
 // mongoose.connect(process.env.MONGOLAB_URI);
-
 app.use( cors() );
+
+app.use( bodyParser.json() );       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true
+})); 
 
 /** this project needs to parse POST bodies **/
 // you should mount the body-parser here
@@ -26,10 +35,25 @@ app.get('/', function(req, res){
 });
 
   
-// your first API endpoint... 
-app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
+//API
+app.post("/api/shorturl/new", function (req, res) {
+  const { url } = req.body;
+  urlShortener( url )
+  .then( (valid) => {
+    res.json(valid);
+  })
+  .catch( (invalid) => {
+    res.json(invalid);
+  })
 });
+
+
+app.get("/api/shorturl/:code", function (req, res) {
+  
+  //res.redirect(200,"asd");
+});
+
+
 
 
 app.listen(port, function () {
