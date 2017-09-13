@@ -18,9 +18,9 @@ describe('isUrlValid() testing',function () {
     });
 
 
-    it('should return valid response (not error) on valid url', function() {
+    it('should return valid response (not error) on valid url with protocol', function() {
         this.timeout(5000);
-        const validUrl = "http://www.google.com";
+        const validUrl = "https://www.google.com";
         return isUrlValid(validUrl)
         .then( (ret) => {
             assert.ok(ret, "Valid response or at least didnt throw err");
