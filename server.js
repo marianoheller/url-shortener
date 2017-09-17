@@ -49,8 +49,14 @@ app.post("/api/shorturl/new", function (req, res) {
 
 
 app.get("/api/shorturl/:code", function (req, res) {
+  urlGetter(req.params.code)
+  .then( (redirectUrl) => {
+    res.redirect(redirectUrl);
+  })
+  .catch( (e) => {
+    res.sendStatus(404);
+  })
   
-  //res.redirect(200,"asd");
 });
 
 

@@ -48,6 +48,7 @@ describe('isUrlValid() testing',function () {
 
 
 describe('urlShortener tests', function() {
+    this.timeout(5000);
     it('correct "valid" url return', function() {
         const validUrl = "www.google.com";
         return urlShortener(validUrl)

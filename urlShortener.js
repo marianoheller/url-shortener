@@ -26,9 +26,11 @@ function urlShortener (url) {
  * @param {string} url 
  */
 function isUrlValid(url) {
+    if( url.startsWith("http://") ) url = url.substring("http://".length);
+    if( url.startsWith("https://") ) url = url.substring("https://".length);
     return new Promise( (resolve, reject) => {
         const errorObject =  {"error":"invalid URL"};
-        dns.resolve(url, (err, addr) => {
+        dns.lookup(url, (err, addr) => {
             if (err) {
                 if (err.code === "ENOTFOUND") reject( errorObject );
                 else reject(err);
@@ -67,7 +69,11 @@ function urlGetter (code) {
     return new Promise( (resolve, reject) => {
         urlRecordModel.findOne({ _id: code}, (err, res) => {
             if( err ) reject(err);
-            resolve(res.original_url);
+            let retUrl = res.original_url;
+            if( !res.original_url.startsWith("http://") || !res.original_url.startsWith("https://") ) {
+                retUrl = "http://" + retUrl;
+            }
+            resolve(retUrl);
         })
     })
 }
