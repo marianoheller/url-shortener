@@ -47,8 +47,22 @@ describe('isUrlValid() testing',function () {
 
 
 
-describe('urlShortener tests', function() {
+describe('generateUrlCode tests', function() {
     this.timeout(5000);
+    it('should return a Number code', function() {
+        const url = "www.google.com.ar";
+        return generateUrlCode(url)
+        .then( (ret) => {
+            assert.equal( typeof(ret), "number", 'returned type is not a Number');
+        } )
+        .catch( (err) => {
+            assert.fail(err, undefined, "generateUrlCode rejected and shouldn't have.");
+        } );
+    })
+});
+
+describe('urlShortener tests', function() {
+    this.timeout(8000);
     it('correct "valid" url return', function() {
         const validUrl = "www.google.com";
         return urlShortener(validUrl)
@@ -70,20 +84,6 @@ describe('urlShortener tests', function() {
 });
 
 
-
-describe('generateUrlCode tests', function() {
-    this.timeout(5000);
-    it('should return a Number code', function() {
-        const url = "www.google.com.ar";
-        return generateUrlCode(url)
-        .then( (ret) => {
-            assert.equal( typeof(ret), "number", 'returned type is not a Number');
-        } )
-        .catch( (err) => {
-            assert.fail(err, undefined, "generateUrlCode rejected and shouldn't have.");
-        } );
-    })
-});
 
 
 describe('urlGetter tests', function() {
